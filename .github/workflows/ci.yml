@@ -98,3 +98,4 @@ jobs:
       - name: CCache stats
         run: msys2do ccache -s
         if: matrix.os == 'windows-latest'
+
