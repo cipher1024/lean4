@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - clang-osx
     tags:
       - '*'
   pull_request:
@@ -15,26 +16,28 @@ jobs:
     strategy:
       matrix:
         # NOTE: must list all targets in `include` here to activate them
-        name: [Linux, "Linux Debug", "Linux fsanitize", "Linux LLVM=ON", macOS, Windows]
+        name: [macOS]
+        # name: [Linux, "Linux Debug", "Linux fsanitize", "Linux LLVM=ON", macOS, Windows]
         include:
-          - name: Linux
-            os: ubuntu-latest
-            check-stage3: true
-            test-speedcenter: true
-          - name: Linux Debug
-            os: ubuntu-latest
-            CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Debug
-          - name: Linux fsanitize
-            os: ubuntu-latest
-            CMAKE_OPTIONS: -DLEAN_EXTRA_CXX_FLAGS=-fsanitize=address,undefined -DLEANC_EXTRA_FLAGS=-fsanitize=address,undefined
-          - name: Linux LLVM=ON
-            os: ubuntu-latest
-            CMAKE_OPTIONS: -DLLVM=ON
+          # - name: Linux
+          #   os: ubuntu-latest
+          #   check-stage3: true
+          #   test-speedcenter: true
+          # - name: Linux Debug
+          #   os: ubuntu-latest
+          #   CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Debug
+          # - name: Linux fsanitize
+          #   os: ubuntu-latest
+          #   CMAKE_OPTIONS: -DLEAN_EXTRA_CXX_FLAGS=-fsanitize=address,undefined -DLEANC_EXTRA_FLAGS=-fsanitize=address,undefined
+          # - name: Linux LLVM=ON
+          #   os: ubuntu-latest
+          #   CMAKE_OPTIONS: -DLLVM=ON
           - name: macOS
             os: macos-latest
-          - name: Windows
-            os: windows-latest
-            CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+            CMAKE_OPTIONS: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+          # - name: Windows
+          #   os: windows-latest
+          #   CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
       # complete all jobs
       fail-fast: false
     env:
@@ -98,4 +101,3 @@ jobs:
       - name: CCache stats
         run: msys2do ccache -s
         if: matrix.os == 'windows-latest'
-
