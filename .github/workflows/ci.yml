@@ -87,7 +87,10 @@ jobs:
         run: msys2do pacman --noconfirm -S make python mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-ccache git diffutils
         if: matrix.os == 'windows-latest'
       - name: Build
-        run: $CLANG -v
+        run: |
+          $CLANG -v
+          $CLANG -print-libgcc-file-name
+          $CLANG -print-search-dirs
       - name: Build
         run: nix-shell --run ./script/ci.sh
         if: matrix.os != 'windows-latest'
