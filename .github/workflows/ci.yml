@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: must list all targets in `include` here to activate them
-        name: [macOS]
+        name: [macOS-clang-nix, macOS-clang-bin, macOS-clang-local]
         # name: [Linux, "Linux Debug", "Linux fsanitize", "Linux LLVM=ON", macOS, Windows]
         include:
           # - name: Linux
@@ -32,9 +32,18 @@ jobs:
           # - name: Linux LLVM=ON
           #   os: ubuntu-latest
           #   CMAKE_OPTIONS: -DLLVM=ON
-          - name: macOS
+          - name: macOS-clang-nix
             os: macos-latest
+            CLANG: clang
             CMAKE_OPTIONS: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+          - name: macOS-clang-bin
+            os: macos-latest
+            CLANG: /usr/bin/clang
+            CMAKE_OPTIONS: -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+          - name: macOS-clang-local
+            os: macos-latest
+            CLANG: /usr/local/opt/llvm/bin/clang
+            CMAKE_OPTIONS: -DCMAKE_C_COMPILER=/usr/local/opt/llvm/bin/clang -DCMAKE_CXX_COMPILER=/usr/local/opt/llvm/bin/clang++
           # - name: Windows
           #   os: windows-latest
           #   CMAKE_OPTIONS: -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
@@ -46,6 +55,7 @@ jobs:
       CCACHE_COMPRESS: true
       # current cache limit
       CCACHE_MAXSIZE: 200M
+      CLANG: ${{ matrix.CLANG }}
       CMAKE_OPTIONS: ${{ matrix.CMAKE_OPTIONS }}
     steps:
       - name: Checkout
@@ -76,6 +86,8 @@ jobs:
       - name: Setup
         run: msys2do pacman --noconfirm -S make python mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-ccache git diffutils
         if: matrix.os == 'windows-latest'
+      - name: Build
+        run: $CLANG -v
       - name: Build
         run: nix-shell --run ./script/ci.sh
         if: matrix.os != 'windows-latest'
