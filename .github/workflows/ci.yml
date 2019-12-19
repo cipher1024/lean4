@@ -91,6 +91,9 @@ jobs:
           $CLANG -v
           $CLANG -print-libgcc-file-name
           $CLANG -print-search-dirs
+          echo $CFLAGS
+          echo $CPATH
+          echo $SDKROOT
       - name: Build
         run: nix-shell --run ./script/ci.sh
         if: matrix.os != 'windows-latest'
